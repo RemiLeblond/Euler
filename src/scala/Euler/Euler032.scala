@@ -17,11 +17,32 @@ object Euler032 {
 
     val result = mutable.Set.empty[Int]
 
-    for (m1 <- multip; m2 <- multip) {
-      val m1p = m1._1.toInt
-      val m2p = m2._1.toInt
-      val prod = m1p * m2p
-      if (ok(m1p, m2p, prod)) result += prod
+    for (m <- multip) {
+      val toTest = m._1.size match {
+        case 4 => Map("" -> m._2).flatMap(el => genPLusOne(el._1, el._2))
+        case 3 =>
+          val level31 = Map("" -> m._2).flatMap(el => genPLusOne(el._1, el._2))
+          val level32 = level31.flatMap(el => genPLusOne(el._1, el._2))
+          level31 ++ level32
+        case 2 =>
+          val level21 = Map("" -> m._2).flatMap(el => genPLusOne(el._1, el._2))
+          val level22 = level21.flatMap(el => genPLusOne(el._1, el._2))
+          val level23 = level22.flatMap(el => genPLusOne(el._1, el._2))
+          level21 ++ level22 ++ level23
+        case 1 =>
+          val level11 = Map("" -> m._2).flatMap(el => genPLusOne(el._1, el._2))
+          val level12 = level11.flatMap(el => genPLusOne(el._1, el._2))
+          val level13 = level12.flatMap(el => genPLusOne(el._1, el._2))
+          val level14 = level13.flatMap(el => genPLusOne(el._1, el._2))
+          level11 ++ level12 ++ level13 ++ level14
+      }
+
+      for (tt <- toTest) {
+        val m1 = m._1.toInt
+        val tt1 = tt._1.toInt
+        val prod = m1 * tt1
+        if (ok(m1, tt1, prod)) result += prod
+      }
     }
 
     var resultT = 0
@@ -29,21 +50,15 @@ object Euler032 {
     for (res <- result) resultT += res
 
     println(resultT)
-    println(ok(123, 456, 788))
-
-    println(level4("3456"))
-    // generer le second en fonction
-    // calculer le produit
-    // checker que les bons nombres restent
   }
 
   def ok(n1: Int, n2: Int, n3: Int): Boolean = {
-    val nbrs = mutable.Set.empty[String]
-    for (char <- n1.toString) nbrs += char.toString
-    for (char <- n2.toString) nbrs += char.toString
-    for (char <- n3.toString) nbrs += char.toString
+    var nbrs = List.empty[String]
+    for (char <- n1.toString) nbrs = char.toString::nbrs
+    for (char <- n2.toString) nbrs = char.toString::nbrs
+    for (char <- n3.toString) nbrs = char.toString::nbrs
 
-    nbrs.toSet == digits
+    (nbrs.toSet == digits) && (nbrs.size == 9)
   }
 
   def genPLusOne(nbr: String, rest: Set[String]): List[(String, Set[String])] = {
